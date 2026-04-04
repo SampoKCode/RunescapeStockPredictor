@@ -1,1 +1,2 @@
 # RunescapeStockPredictor
+Discord bot used to check items that are currently cheap based on the daily average. In the future, will use linear regression to scope out items that are currenty cheap compared to long-term trends.
