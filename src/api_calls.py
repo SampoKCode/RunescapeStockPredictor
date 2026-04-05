@@ -9,10 +9,23 @@ headers = {
 }
 
 def get_latest_data():
-    # returns json of avgHighPrice avgLowPrice lowPriceVolume
+    # data{id{avgHighPrice,highPriceVolume,avgLowPrice,lowPriceVolume}},timestamp
     try:
         url = baseurl + "5m"
-        response = requests.get(url)
+        response = requests.get(url,headers=headers)
+        data = response.json()
+        return data
+    except requests.exceptions.HTTPError as err:
+        print(f"HTTP error occurred: {err}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+    return 0
+
+def get_daily_data():
+    # data{id{avgHighPrice,highPriceVolume,avgLowPrice,lowPriceVolume}},timestamp
+    try:
+        url = baseurl + "24h"
+        response = requests.get(url,headers=headers)
         data = response.json()
         return data
     except requests.exceptions.HTTPError as err:
@@ -24,10 +37,11 @@ def get_latest_data():
 def get_timeseries_data(id):
     # returns timeseries data of given item
     # json of 
-    # data{id{avgHighPrice,highPriceVolume,avgLowPrice,lowPriceVolume}},timestamp
+    # data{id{timestamp,avgHighPrice,avgLowPrice,
+    # highPriceVolume,lowPriceVolume}},itemId
     try:
         url = baseurl + "timeseries?timestep=5m&id=" + str(id)
-        response = requests.get(url)
+        response = requests.get(url,headers=headers)
         data = response.json()
         return data
     except requests.exceptions.HTTPError as err:
@@ -45,6 +59,21 @@ def main():
     # get latest data, can loop over them (i think)
     json_data = get_latest_data()
     print("individual items", json_data.get("data")[str(itemid)])
+    print("timestamp", json_data.get("timestamp"))
+
+    # get first five of daily
+    json_data = get_daily_data()
+    print("daily data:")
+    i = 0
+    for key,value in json_data.get("data").items():
+        if i > 5:
+            break
+        print(key)
+        print(value["avgHighPrice"], 
+              value["highPriceVolume"],
+              value["avgLowPrice"],
+              value["lowPriceVolume"])
+        i += 1
     print("timestamp", json_data.get("timestamp"))
 
     # get data of certain item (gives the same data)
